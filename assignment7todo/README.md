@@ -14,3 +14,51 @@ The React Compiler is not enabled on this template because of its impact on dev 
 ## Expanding the ESLint configuration
 
 If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+
+
+
+# 📝 Todo Manager (React + Tailwind)
+
+A clean and responsive Todo Manager built using **React**, **Context API**, and **TailwindCSS**.  
+This project demonstrates key React concepts like state management, component composition, context usage, local storage persistence, and UI behavior enhancements.
+
+---
+
+## ✨ Features
+
+### ✅ Core Features
+- ➕ Add new todos  
+- 🖊️ Edit existing todos  
+- 💾 Press **Enter** to save edits  
+- ❌ Delete todos  
+- ✔️ Mark todos as completed  
+- 💽 Automatic saving to **Local Storage**  
+- 🎨 Fully responsive UI
+
+### 🆕 Added Features (Your Assignment Enhancements)
+- 🔍 **Filter Todos by status**  
+  - All  
+  - Completed  
+  - Pending  
+- 🎯 Improved UI for filter buttons to match the overall design
+
+---
+
+## 🛠️ Tech Stack
+
+- **React 19**
+- **Vite**
+- **TailwindCSS**
+- **Context API**
+- **Local Storage API**
+
+---
+
+## 🚀 Getting Started
+
+Follow these steps to run the project locally.
+
+### **1️⃣ Clone the repository**
+```bash
+git clone <your-repo-url>
+cd assignment7todo
