@@ -1,0 +1,21 @@
+// for in loop
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Document</title>
+</head>
+<body>
+    <div id="demo">
+
+    </div>
+    <script>
+        let x = [1, 2, 3, 4];
+        let text = "";
+        for (let value in x){
+            text += value + "<hr>";
+        }
+        document.getElementById("demo").innerHTML = text
+
+    </script>
+</body>
+</html>

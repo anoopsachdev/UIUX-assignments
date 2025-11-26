@@ -1,0 +1,166 @@
+/* -----------------------------
+   Global Page Styling
+--------------------------------*/
+body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #fafafa;
+    color: #333;
+    line-height: 1.6;
+}
+
+/* -----------------------------
+   Navigation Bar
+--------------------------------*/
+nav {
+    background-color: #fff;
+    padding: 12px;
+    text-align: center;
+    border-bottom: 1px solid #ddd;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+nav a {
+    margin: 0 15px;
+    font-weight: bold;
+    color: cornflowerblue;
+    text-decoration: none;
+    font-size: 16px;
+}
+
+nav a:hover {
+    color: #1b4fb9;
+}
+
+/* -----------------------------
+   Main Heading
+--------------------------------*/
+h1 {
+    text-align: center;
+    background-color: #212121;
+    color: bisque;
+    padding: 25px 0;
+    margin: 0;
+    font-size: 34px;
+}
+
+/* -----------------------------
+   Section Titles
+--------------------------------*/
+h2, h3 {
+    color: chocolate;
+    margin-left: 40px;
+    margin-top: 40px;
+}
+
+/* -----------------------------
+   Paragraphs
+--------------------------------*/
+p {
+    margin-left: 40px;
+    margin-right: 40px;
+    font-size: 17px;
+}
+
+/* -----------------------------
+   Profile Image
+--------------------------------*/
+.profile-img {
+    width: 200px;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 50%;
+    display: block;
+    margin: 20px 40px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+}
+
+/* -----------------------------
+   Table (Education)
+--------------------------------*/
+table {
+    width: 90%;
+    margin: 30px auto;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.12);
+}
+
+th, td {
+    border: 1px solid #ccc;
+    padding: 12px 15px;
+    text-align: left;
+}
+
+th {
+    background-color: cornflowerblue;
+    color: white;
+    font-size: 16px;
+}
+
+td {
+    background-color: #fff;
+}
+
+/* -----------------------------
+   Skills List
+--------------------------------*/
+ul, ol {
+    margin-left: 55px;
+    margin-right: 40px;
+}
+
+ul li {
+    margin: 8px 0;
+    list-style-type: square;
+    font-size: 16px;
+}
+
+/* -----------------------------
+   Projects Section
+--------------------------------*/
+.project-img {
+    width: 260px;
+    height: auto;
+    border-radius: 6px;
+    margin: 10px 40px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.12);
+}
+
+#projects p {
+    margin-bottom: 25px;
+    background: #ffffff;
+    padding: 15px 20px;
+    border-radius: 8px;
+    margin-right: 40px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+/* -----------------------------
+   Contact Links
+--------------------------------*/
+a {
+    color: cornflowerblue;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* -----------------------------
+   Footer
+--------------------------------*/
+footer {
+    margin-top: 50px;
+    padding: 15px;
+    text-align: center;
+    background-color: #212121;
+    color: white;
+    font-size: 15px;
+}

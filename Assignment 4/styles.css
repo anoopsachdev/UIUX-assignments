@@ -1,0 +1,181 @@
+/* ======================================
+   GLOBAL STYLING
+====================================== */
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f7f7f7;
+}
+
+/* NAV BAR */
+nav {
+    background: #222;
+    padding: 15px;
+    text-align: center;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+nav a {
+    color: white;
+    margin: 0 12px;
+    text-decoration: none;
+    font-size: 17px;
+}
+
+nav a:hover {
+    color: #ffcc00; /* pseudo-class */
+}
+
+/* MAIN CONTAINER */
+.container {
+    width: 85%;
+    margin: auto;
+    padding: 20px;
+}
+
+/* BANNERS */
+.banner {
+    width: 100%;
+    height: 260px;
+    object-fit: cover;
+    margin-bottom: 20px;
+}
+
+/* ======================================
+   FLEXBOX SECTIONS
+====================================== */
+
+.flex-center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* ======================================
+   BOX MODEL (ALL PAGES)
+====================================== */
+h1, h2 {
+    color: #222;
+    margin-bottom: 10px;
+}
+
+p, ul, ol {
+    margin-bottom: 15px;
+    line-height: 1.6;
+}
+
+/* ======================================
+   FORMS
+====================================== */
+form {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-sizing: border-box; /* box model */
+}
+
+input, select, textarea {
+    width: 100%;
+    padding: 10px;
+    margin: 12px 0;
+    border: 1px solid #bbb;
+}
+
+/* Attribute Selector Example */
+input[type="text"] {
+    border-color: #666;
+}
+
+/* Pseudo-element Example */
+label::after {
+    content: " *";
+    color: red;
+}
+
+/* ======================================
+   GALLERY (Responsive CSS Grid)
+====================================== */
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+.grid img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 6px;
+}
+
+/* ======================================
+   TABLES
+====================================== */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    margin-top: 20px;
+}
+
+table, th, td {
+    border: 1px solid #aaa;
+}
+
+th, td {
+    padding: 12px;
+    text-align: center;
+}
+
+th {
+    background: #333;
+    color: white;
+}
+
+/* ======================================
+   VIDEO SECTION
+====================================== */
+.video-wrapper {
+    margin: 20px 0;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+/* ======================================
+   FOOTER
+====================================== */
+footer {
+    background: #222;
+    color: white;
+    text-align: center;
+    padding: 18px;
+    margin-top: 40px;
+}
+
+/* ======================================
+   RESPONSIVE DESIGN (Media Queries)
+====================================== */
+
+/* Tablets */
+@media (max-width: 900px) {
+    .grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* Mobile Phones */
+@media (max-width: 600px) {
+    
+
+    .grid {
+        grid-template-columns: repeat(1, 1fr);
+    }
+
+    .banner {
+        height: 200px;
+    }
+}

@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Canvas Image Processing — Demo</title>
+  <style>
+    body {
+      font-family: system-ui, Arial;
+      background: #0f1720;
+      color: #e6eef6;
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      gap: 20px;
+      align-items: flex-start;
+    }
+    .panel {
+      background: #0b1220;
+      border-radius: 8px;
+      padding: 14px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.6);
+    }
+    canvas { display:block; background:#222; border-radius:6px; }
+    #controls { width: 340px; }
+    label { display:block; margin-top:8px; font-size:13px; color:#bcd; }
+    input[type="range"] { width:100%; }
+    button { margin-top:8px; padding:8px 10px; border-radius:6px; background:#1f2937; color:#fff; border:1px solid #374151; cursor:pointer; }
+    button:hover { filter:brightness(1.05); }
+    .row { display:flex; gap:8px; margin-top:8px; }
+    .small { font-size:12px; color:#9fb; }
+    #histogram { width:320px; height:90px; background:#081018; border-radius:6px; margin-top:8px; }
+    .note { font-size:12px; color:#9aa; margin-top:8px; }
+  </style>
+</head>
+<body>
+  <!-- LEFT: canvas area -->
+  <div class="panel" style="width:760px;">
+    <div style="display:flex; gap:12px; align-items:center;">
+      <input id="file" type="file" accept="image/*" />
+      <button id="useSample">Load sample image</button>
+      <button id="reset">Reset</button>
+      <div class="small">Tip: use a local file to avoid CORS issues</div>
+    </div>
+
+    <div style="display:flex; gap:12px; margin-top:12px;">
+      <div>
+        <!-- Visible canvas for user -->
+        <canvas id="canvas" width="640" height="360"></canvas>
+      </div>
+      <div>
+        <!-- Offscreen canvas to keep original image (so we can reapply filters non-destructively) -->
+        <div class="small">Original (hidden)</div>
+        <canvas id="origCanvas" width="320" height="180" style="display:none"></canvas>
+        <div id="pixelInfo" class="small note">Hover over canvas to see pixel RGBA</div>
+      </div>
+    </div>
+
+    <div class="note">
+      This demo edits pixel data using <code>getImageData</code> / <code>putImageData</code>.
+      Convolution filters run in JavaScript; performance is OK for moderate sized images.
+    </div>
+  </div>
+
+  <!-- RIGHT: controls -->
+  <div id="controls" class="panel">
+    <h3 style="margin:0 0 6px 0">Filters & Controls</h3>
+
+    <!-- Quick filters -->
+    <div class="row">
+      <button id="grayscale">Grayscale</button>
+      <button id="invert">Invert</button>
+      <button id="sepia">Sepia</button>
+    </div>
+
+    <!-- Brightness and contrast -->
+    <label>Brightness <span id="brightnessVal">0</span></label>
+    <input id="brightness" type="range" min="-100" max="100" value="0" />
+
+    <label>Contrast <span id="contrastVal">0</span></label>
+    <input id="contrast" type="range" min="-100" max="100" value="0" />
+
+    <div class="row">
+      <button id="applyBC">Apply B & C</button>
+      <button id="undoBC">Undo B & C</button>
+    </div>
+
+    <!-- Convolution kernels -->
+    <label>Convolution Filters</label>
+    <div class="row">
+      <button data-kernel="blur" class="kernelBtn">Blur</button>
+      <button data-kernel="sharpen" class="kernelBtn">Sharpen</button>
+      <button data-kernel="edge" class="kernelBtn">Edge Detect</button>
+      <button data-kernel="emboss" class="kernelBtn">Emboss</button>
+    </div>
+
+    <label>Sobel Edge (better edges)</label>
+    <div class="row">
+      <button id="sobel">Sobel</button>
+      <button id="sobelColor">Sobel (Color)</button>
+    </div>
+
+    <label>Histogram</label>
+    <canvas id="histogram"></canvas>
+    <div class="row">
+      <button id="showHist">Show Histogram</button>
+      <button id="equalize">Equalize (simple)</button>
+    </div>
+
+    <div class="row">
+      <button id="download">Download PNG</button>
+      <button id="applyAll">Apply filter pipeline (demo)</button>
+    </div>
+
+    <div class="note">All operations are applied to an internal working copy. Use <strong>Reset</strong> to restore original.</div>
+  </div>
+
+  <script>
+  /**************************************************************************
+   * Image Processing Demo — lots of comments to explain how things work
+   *
+   * Main ideas:
+   *  - Load image into an "original" offscreen canvas
+   *  - Work on a displayed canvas (getImageData/putImageData)
+   *  - Implement various pixel operations (per-pixel and convolution)
+   **************************************************************************/
+
+  // UI elements
+  const fileInput = document.getElementById('file');
+  const canvas = document.getElementById('canvas');
+  const ctx = canvas.getContext('2d');
+
+  const origCanvas = document.getElementById('origCanvas');
+  const origCtx = origCanvas.getContext('2d');
+
+  // Controls
+  const grayscaleBtn = document.getElementById('grayscale');
+  const invertBtn = document.getElementById('invert');
+  const sepiaBtn = document.getElementById('sepia');
+  const brightnessSlider = document.getElementById('brightness');
+  const contrastSlider = document.getElementById('contrast');
+  const brightnessVal = document.getElementById('brightnessVal');
+  const contrastVal = document.getElementById('contrastVal');
+  const applyBCBtn = document.getElementById('applyBC');
+  const undoBCBtn = document.getElementById('undoBC');
+  const kernelBtns = document.querySelectorAll('.kernelBtn');
+  const sobelBtn = document.getElementById('sobel');
+  const sobelColorBtn = document.getElementById('sobelColor');
+  const histogramCanvas = document.getElementById('histogram');
+  const histCtx = histogramCanvas.getContext('2d');
+  const showHistBtn = document.getElementById('showHist');
+  const equalizeBtn = document.getElementById('equalize');
+  const downloadBtn = document.getElementById('download');
+  const resetBtn = document.getElementById('reset');
+  const useSampleBtn = document.getElementById('useSample');
+  const applyAllBtn = document.getElementById('applyAll');
+  const pixelInfo = document.getElementById('pixelInfo');
+
+  // Internal state:
+  let originalImageData = null; // untouched original
+  let workingImageData = null;  // current working copy shown on canvas
+
+  // Helper: clamp value to [0,255]
+  function clamp(v){ return Math.max(0, Math.min(255, v)); }
+
+  // Load image from a File or URL -> draw to canvases
+  function loadImage(img) {
+    // img is an HTMLImageElement
+    // Fit the display canvas to the image while keeping width <= 640
+    const maxW = 640;
+    const scale = Math.min(1, maxW / img.width);
+    const w = Math.round(img.width * scale);
+    const h = Math.round(img.height * scale);
+
+    // Resize canvases
+    canvas.width = w;
+    canvas.height = h;
+    origCanvas.width = w;
+    origCanvas.height = h;
+
+    // Draw original image to both canvases
+    origCtx.clearRect(0,0,origCanvas.width, origCanvas.height);
+    origCtx.drawImage(img, 0, 0, w, h);
+
+    ctx.clearRect(0,0,canvas.width, canvas.height);
+    ctx.drawImage(img, 0, 0, w, h);
+
+    // Save original image data
+    originalImageData = origCtx.getImageData(0,0,w,h);
+    workingImageData = ctx.getImageData(0,0,w,h);
+  }
+
+  // Load from file input
+  fileInput.addEventListener('change', e=>{
+    const file = e.target.files[0];
+    if(!file) return;
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    // For local files, CORS doesn't apply. For external URLs, must be CORS-enabled.
+    img.onload = ()=>{
+      loadImage(img);
+      URL.revokeObjectURL(url);
+    };
+    img.src = url;
+  });
+
+  // Sample image (hosted via placeholder — may have CORS restrictions in some browsers)
+  useSampleBtn.addEventListener('click', ()=>{
+    const img = new Image();
+    img.crossOrigin = 'anonymous'; // attempt to avoid tainting canvas
+    // A reasonably sized sample; replace if blocked by CORS
+    img.src = 'https://picsum.photos/800/450?random=5';
+    img.onload = ()=> loadImage(img);
+    img.onerror = ()=> alert('Sample image failed to load due to CORS. Upload a local file instead.');
+  });
+
+  // Reset to original
+  resetBtn.addEventListener('click', ()=>{
+    if(!originalImageData) return;
+    // copy original to working and display
+    workingImageData = new ImageData(new Uint8ClampedArray(originalImageData.data), originalImageData.width, originalImageData.height);
+    ctx.putImageData(workingImageData, 0, 0);
+    // clear histogram
+    histCtx.clearRect(0,0,histogramCanvas.width,histogramCanvas.height);
+  });
+
+  // UPDATE display helper (call after modifying workingImageData)
+  function updateDisplay() {
+    if(!workingImageData) return;
+    ctx.putImageData(workingImageData, 0, 0);
+  }
+
+  // ----------------------
+  // Per-pixel operations
+  // ----------------------
+
+  // Grayscale: average method (better: luminosity formula)
+  function applyGrayscale() {
+    if(!workingImageData) return;
+    const d = workingImageData.data;
+    for(let i=0;i<d.length;i+=4){
+      // luminosity: 0.2126 R + 0.7152 G + 0.0722 B
+      const lum = 0.2126*d[i] + 0.7152*d[i+1] + 0.0722*d[i+2];
+      d[i]=d[i+1]=d[i+2]=lum;
+    }
+    updateDisplay();
+  }
+
+  grayscaleBtn.addEventListener('click', applyGrayscale);
+
+  // Invert colors
+  function applyInvert() {
+    if(!workingImageData) return;
+    const d = workingImageData.data;
+    for(let i=0;i<d.length;i+=4){
+      d[i] = 255 - d[i];     // R
+      d[i+1] = 255 - d[i+1]; // G
+      d[i+2] = 255 - d[i+2]; // B
+    }
+    updateDisplay();
+  }
+  invertBtn.addEventListener('click', applyInvert);
+
+  // Sepia
+  function applySepia() {
+    if(!workingImageData) return;
+    const d = workingImageData.data;
+    for(let i=0;i<d.length;i+=4){
+      const r = d[i], g = d[i+1], b = d[i+2];
+      // Common sepia formula
+      d[i]   = clamp((r * .393) + (g *.769) + (b * .189));
+      d[i+1] = clamp((r * .349) + (g *.686) + (b * .168));
+      d[i+2] = clamp((r * .272) + (g *.534) + (b * .131));
+    }
+    updateDisplay();
+  }
+  sepiaBtn.addEventListener('click', applySepia);
+
+  // Brightness and contrast adjustments
+  // brightness in [-100,100], contrast in [-100,100]
+  function applyBrightnessContrast(b, c) {
+    if(!originalImageData) return;
+    // We'll base brightness/contrast on ORIGINAL so repeated slider moves don't accumulate errors.
+    // Copy original to working
+    workingImageData = new ImageData(new Uint8ClampedArray(originalImageData.data), originalImageData.width, originalImageData.height);
+    const d = workingImageData.data;
+
+    // Convert contrast percent to factor
+    // formula: factor = (259*(contrast+255)) / (255*(259-contrast))
+    // where contrast in [-255,255]; we map our [-100,100] to [-255,255]
+    const cVal = (c/100) * 255;
+    const factor = (259 * (cVal + 255)) / (255 * (259 - cVal));
+    const bVal = b; // brightness offset in [-100,100], we'll map to [-255,255] by multiply by 2.55
+    const bOffset = bVal * 2.55;
+
+    for(let i=0;i<d.length;i+=4){
+      // apply brightness then contrast per channel
+      d[i]   = clamp(factor * (d[i]   - 128) + 128 + bOffset);
+      d[i+1] = clamp(factor * (d[i+1] - 128) + 128 + bOffset);
+      d[i+2] = clamp(factor * (d[i+2] - 128) + 128 + bOffset);
+      // alpha unchanged
+    }
+    updateDisplay();
+  }
+
+  // UI: update labels as sliders move
+  brightnessSlider.addEventListener('input', ()=> brightnessVal.textContent = brightnessSlider.value);
+  contrastSlider.addEventListener('input', ()=> contrastVal.textContent = contrastSlider.value);
+
+  applyBCBtn.addEventListener('click', ()=> {
+    const b = parseInt(brightnessSlider.value,10);
+    const c = parseInt(contrastSlider.value,10);
+    applyBrightnessContrast(b,c);
+  });
+
+  // undo: restore working to original (so slider isn't destructive)
+  undoBCBtn.addEventListener('click', ()=> {
+    if(!originalImageData) return;
+    workingImageData = new ImageData(new Uint8ClampedArray(originalImageData.data), originalImageData.width, originalImageData.height);
+    ctx.putImageData(workingImageData, 0, 0);
+    brightnessSlider.value = 0; contrastSlider.value = 0;
+    brightnessVal.textContent = '0'; contrastVal.textContent = '0';
+  });
+
+  // ----------------------
+  // Convolution helpers
+  // ----------------------
+
+  // Apply a convolution kernel (3x3 or NxN) to the current workingImageData
+  function convolve(kernel, kernelSize = 3, divisor = null, bias = 0) {
+    if(!workingImageData) return;
+    const src = workingImageData;
+    const width = src.width, height = src.height;
+    const srcData = src.data;
+    // make a copy of src pixels to read from while we write to dest
+    const dest = new Uint8ClampedArray(srcData.length);
+
+    // If divisor is not set, sum the kernel elements
+    if(!divisor) {
+      divisor = kernel.reduce((a,b)=>a+b,0) || 1;
+    }
+
+    const half = Math.floor(kernelSize/2);
+
+    // iterate over every pixel
+    for(let y=0;y<height;y++){
+      for(let x=0;x<width;x++){
+        let r=0,g=0,b=0;
+        // apply kernel
+        for(let ky=-half;ky<=half;ky++){
+          for(let kx=-half;kx<=half;kx++){
+            const ix = x + kx;
+            const iy = y + ky;
+            // clamp coordinates at edges (edge handling: clamp)
+            const cx = Math.max(0, Math.min(width-1, ix));
+            const cy = Math.max(0, Math.min(height-1, iy));
+            const offset = (cy*width + cx) * 4;
+            const kval = kernel[(ky+half)*kernelSize + (kx+half)];
+            r += srcData[offset] * kval;
+            g += srcData[offset+1] * kval;
+            b += srcData[offset+2] * kval;
+          }
+        }
+        const dstOff = (y*width + x)*4;
+        dest[dstOff]   = clamp((r/divisor) + bias);
+        dest[dstOff+1] = clamp((g/divisor) + bias);
+        dest[dstOff+2] = clamp((b/divisor) + bias);
+        dest[dstOff+3] = srcData[dstOff+3]; // alpha unchanged
+      }
+    }
+
+    // replace workingImageData with the convolved result
+    workingImageData = new ImageData(dest, width, height);
+    updateDisplay();
+  }
+
+  // Predefined kernels (3x3)
+  const KERNELS = {
+    blur: {
+      kernel: [
+        1,1,1,
+        1,1,1,
+        1,1,1
+      ],
+      size: 3
+    },
+    sharpen: {
+      kernel:[
+         0,-1, 0,
+        -1, 5,-1,
+         0,-1, 0
+      ],
+      size:3
+    },
+    edge: {
+      kernel:[
+        -1,-1,-1,
+        -1, 8,-1,
+        -1,-1,-1
+      ],
+      size:3
+    },
+    emboss: {
+      kernel:[
+        -2,-1,0,
+        -1, 1,1,
+         0, 1,2
+      ],
+      size:3,
+      divisor:1,
+      bias:128 // emboss often needs bias to center values
+    }
+  };
+
+  // Attach kernel buttons
+  kernelBtns.forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const key = btn.dataset.kernel;
+      const obj = KERNELS[key];
+      if(!obj){ alert('Unknown kernel'); return; }
+      convolve(obj.kernel, obj.size, obj.divisor || null, obj.bias || 0);
+    });
+  });
+
+  // ----------------------
+  // Sobel Edge Detection
+  // ----------------------
+  function sobelEdge(colorOutput=false) {
+    if(!workingImageData) return;
+    // We'll read from originalImageData to avoid repeated accumulation
+    const src = new ImageData(new Uint8ClampedArray(workingImageData.data), workingImageData.width, workingImageData.height);
+    const width = src.width, height = src.height;
+    const srcData = src.data;
+    const dest = new Uint8ClampedArray(srcData.length);
+
+    // Sobel kernels (Gx, Gy)
+    const gx = [-1,0,1,-2,0,2,-1,0,1];
+    const gy = [-1,-2,-1,0,0,0,1,2,1];
+
+    const half = 1; // 3x3 kernel
+
+    for(let y=0;y<height;y++){
+      for(let x=0;x<width;x++){
+        let sumRx=0,sumGx=0,sumBx=0;
+        let sumRy=0,sumGy=0,sumBy=0;
+
+        for(let ky=-half;ky<=half;ky++){
+          for(let kx=-half;kx<=half;kx++){
+            const ix = Math.max(0, Math.min(width-1, x+kx));
+            const iy = Math.max(0, Math.min(height-1, y+ky));
+            const off = (iy*width + ix) * 4;
+            const kvalX = gx[(ky+half)*3 + (kx+half)];
+            const kvalY = gy[(ky+half)*3 + (kx+half)];
+            sumRx += srcData[off]   * kvalX;
+            sumGx += srcData[off+1] * kvalX;
+            sumBx += srcData[off+2] * kvalX;
+            sumRy += srcData[off]   * kvalY;
+            sumGy += srcData[off+1] * kvalY;
+            sumBy += srcData[off+2] * kvalY;
+          }
+        }
+
+        const magR = Math.hypot(sumRx, sumRy);
+        const magG = Math.hypot(sumGx, sumGy);
+        const magB = Math.hypot(sumBx, sumBy);
+
+        const magnitude = colorOutput ? clamp(magR) : clamp((magR+magG+magB)/3);
+
+        const dstOff = (y*width + x)*4;
+        if(colorOutput){
+          dest[dstOff]   = clamp(magR);
+          dest[dstOff+1] = clamp(magG);
+          dest[dstOff+2] = clamp(magB);
+        } else {
+          dest[dstOff] = dest[dstOff+1] = dest[dstOff+2] = magnitude;
+        }
+        dest[dstOff+3] = srcData[dstOff+3]; // keep alpha
+      }
+    }
+
+    workingImageData = new ImageData(dest, width, height);
+    updateDisplay();
+  }
+  sobelBtn.addEventListener('click', ()=>sobelEdge(false));
+  sobelColorBtn.addEventListener('click', ()=>sobelEdge(true));
+
+  // ----------------------
+  // Histogram & equalization (simple)
+  // ----------------------
+  function drawHistogram() {
+    if(!workingImageData) return;
+    const w = histogramCanvas.width;
+    const h = histogramCanvas.height;
+    histCtx.clearRect(0,0,w,h);
+
+    const data = workingImageData.data;
+    const countsR = new Uint32Array(256);
+    const countsG = new Uint32Array(256);
+    const countsB = new Uint32Array(256);
+
+    for(let i=0;i<data.length;i+=4){
+      countsR[data[i]]++;
+      countsG[data[i+1]]++;
+      countsB[data[i+2]]++;
+    }
+
+    const maxCount = Math.max(...countsR, ...countsG, ...countsB);
+    // draw three overlapped histograms (R,G,B)
+    // scale x to 256 values
+    for(let x=0;x<256;x++){
+      const xr = (x / 256) * w;
+      const hr = (countsR[x] / maxCount) * h;
+      const hg = (countsG[x] / maxCount) * h;
+      const hb = (countsB[x] / maxCount) * h;
+
+      // simple filled rectangles for each channel with alpha
+      histCtx.fillStyle = 'rgba(255,0,0,0.6)'; histCtx.fillRect(xr, h-hr, Math.max(1, w/256), hr);
+      histCtx.fillStyle = 'rgba(0,255,0,0.45)'; histCtx.fillRect(xr, h-hg, Math.max(1, w/256), hg);
+      histCtx.fillStyle = 'rgba(0,150,255,0.35)'; histCtx.fillRect(xr, h-hb, Math.max(1, w/256), hb);
+    }
+  }
+  showHistBtn.addEventListener('click', drawHistogram);
+
+  // Simple histogram equalization on luminance
+  function equalizeHistogram() {
+    if(!workingImageData) return;
+    const width = workingImageData.width;
+    const height = workingImageData.height;
+    const data = workingImageData.data;
+    const lumCounts = new Uint32Array(256);
+
+    // compute luminance per pixel and histogram
+    const lumArr = new Uint8Array((data.length/4));
+    let idx = 0;
+    for(let i=0;i<data.length;i+=4){
+      const lum = Math.round(0.2126*data[i] + 0.7152*data[i+1] + 0.0722*data[i+2]);
+      lumArr[idx++] = lum;
+      lumCounts[lum]++;
+    }
+
+    // compute cumulative distribution function (CDF)
+    const cdf = new Float32Array(256);
+    const pixelCount = lumArr.length;
+    let cum = 0;
+    for(let i=0;i<256;i++){
+      cum += lumCounts[i];
+      cdf[i] = cum / pixelCount;
+    }
+
+    // map old luminance -> new value and apply equally to RGB channels proportionally
+    idx = 0;
+    for(let i=0;i<data.length;i+=4){
+      const oldLum = lumArr[idx++];
+      const newLum = Math.round(cdf[oldLum] * 255);
+      // find ratio to scale each channel to match new luminance while preserving color
+      const r = data[i], g = data[i+1], b = data[i+2];
+      const oldL = oldLum || 1; // avoid division by zero
+      const ratio = newLum / oldL;
+      data[i] = clamp(r * ratio);
+      data[i+1] = clamp(g * ratio);
+      data[i+2] = clamp(b * ratio);
+    }
+    updateDisplay();
+    drawHistogram();
+  }
+  equalizeBtn.addEventListener('click', equalizeHistogram);
+
+  // ----------------------
+  // Misc: download / pixel inspector
+  // ----------------------
+  downloadBtn.addEventListener('click', ()=>{
+    const link = document.createElement('a');
+    link.download = 'processed.png';
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+  });
+
+  // Simple pixel inspector: show RGBA under mouse
+  canvas.addEventListener('mousemove', (e)=>{
+    if(!workingImageData) return;
+    const rect = canvas.getBoundingClientRect();
+    const x = Math.floor((e.clientX - rect.left) * (canvas.width / rect.width));
+    const y = Math.floor((e.clientY - rect.top)  * (canvas.height / rect.height));
+    if(x < 0 || y < 0 || x >= canvas.width || y >= canvas.height) return;
+    const off = (y*canvas.width + x) * 4;
+    const d = workingImageData.data;
+    const r = d[off], g = d[off+1], b = d[off+2], a = d[off+3];
+    pixelInfo.textContent = `x:${x}, y:${y}  —  R:${r}  G:${g}  B:${b}  A:${a}`;
+  });
+
+  canvas.addEventListener('mouseleave', ()=> pixelInfo.textContent = 'Hover over canvas to see pixel RGBA');
+
+  // ----------------------
+  // Pipeline demo button
+  // ----------------------
+  applyAllBtn.addEventListener('click', ()=>{
+    // demo pipeline: equalize, slight sharpen, sobel overlay
+    equalizeHistogram(); // modifies workingImageData
+    // small sharpen
+    convolve(KERNELS.sharpen.kernel, 3);
+    // overlay Sobel as multiply blend (simple approach)
+    const base = ctx.getImageData(0,0,canvas.width, canvas.height);
+    sobelEdge(false); // produces grayscale edges in workingImageData
+    const edges = workingImageData;
+    // blend edges onto base (darken where edge magnitude is high)
+    for(let i=0;i<base.data.length;i+=4){
+      const e = edges.data[i]; // edges grayscale
+      // subtract a scaled edge value from base to emphasize
+      base.data[i] = clamp(base.data[i] - e*0.6);
+      base.data[i+1] = clamp(base.data[i+1] - e*0.6);
+      base.data[i+2] = clamp(base.data[i+2] - e*0.6);
+    }
+    workingImageData = base;
+    updateDisplay();
+  });
+
+  // ----------------------
+  // Pixel: direct editing examples
+  // ----------------------
+  // Example usage of getImageData/putImageData showed above. They return/accept ImageData objects
+  // (a width, height and a Uint8ClampedArray with RGBA channels sequentially).
+
+  // ----------------------
+  // Initialize: try loading sample automatically
+  // ----------------------
+  (()=>{
+    // set histogram canvas size to match control width
+    histogramCanvas.width = 320;
+    histogramCanvas.height = 90;
+    // Optionally, auto-load a sample (commented out to avoid CORS in some environments)
+    // useSampleBtn.click();
+  })();
+
+  </script>
+</body>
+</html>
