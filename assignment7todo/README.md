@@ -17,9 +17,9 @@ If you are developing a production application, we recommend using TypeScript wi
 
 
 
-# 📝 Todo Manager (React + Tailwind)
+# 📝 Todo Manager (React)
 
-A clean and responsive Todo Manager built using **React**, **Context API**, and **TailwindCSS**.  
+A clean and responsive Todo Manager built using **React**, **Context API**, **localStorage** and **TailwindCSS**.  
 This project demonstrates key React concepts like state management, component composition, context usage, local storage persistence, and UI behavior enhancements.
 
 ---
@@ -34,13 +34,10 @@ This project demonstrates key React concepts like state management, component co
 - ✔️ Mark todos as completed  
 - 💽 Automatic saving to **Local Storage**  
 - 🎨 Fully responsive UI
-
-### 🆕 Added Features (Your Assignment Enhancements)
 - 🔍 **Filter Todos by status**  
   - All  
   - Completed  
-  - Pending  
-- 🎯 Improved UI for filter buttons to match the overall design
+  - Pending 
 
 ---
 
@@ -54,11 +51,4 @@ This project demonstrates key React concepts like state management, component co
 
 ---
 
-## 🚀 Getting Started
-
-Follow these steps to run the project locally.
-
-### **1️⃣ Clone the repository**
-```bash
-git clone <your-repo-url>
-cd assignment7todo
+## 📸 Screenshots
