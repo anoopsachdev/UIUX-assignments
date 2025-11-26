@@ -18,7 +18,7 @@ export const TodoContext = createContext({
 // you define in the components that you use them. this is the difference between contextapi and redux toolkit
 // the functionalities to be used, you will only be writing there name, not there functionality (we will decide its functionalities in the App.jsx or in the component)
 
-export const useToDo = () =>{
+export const useTodo = () =>{
     return useContext(TodoContext)
 }
 
