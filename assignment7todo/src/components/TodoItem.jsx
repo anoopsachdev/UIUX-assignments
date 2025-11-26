@@ -1,4 +1,5 @@
 import React from 'react'
+import { useTodo } from "../contexts"
 import {  useState } from 'react'
 function TodoItem({todo}) {
     const [isTodoEditable, setIsTodoEditable] = useState(false)
@@ -6,6 +7,7 @@ function TodoItem({todo}) {
     const {updateTodo, deleteTodo, toggleComplete} = useTodo()
     const editTodo = () => {
         updateTodo(todo.id, {...todo, todo: todoMsg})
+        setIsTodoEditable(false)
     }
     const toggleCompleted = () => {
         toggleComplete(todo.id)
@@ -30,6 +32,15 @@ function TodoItem({todo}) {
                 value={todoMsg}
                 onChange={(e) => setTodoMsg(e.target.value)}
                 readOnly={!isTodoEditable}
+                
+                onKeyDown={(e) => {
+                    // save changes on hitting the enter button
+                    if (e.key === "Enter" && isTodoEditable){
+                        editTodo(); // save changes
+                    }
+                    
+                }}
+                
             />
             {/* Edit, Save Button */}
             <button

@@ -2,9 +2,12 @@ import { useEffect, useState } from 'react'
 import {TodoProvider} from "./contexts"
 import TodoForm from './components/TodoForm'
 import TodoItem from './components/TodoItem'
+import { DndContext, closestCenter } from "@dnd-kit/core"
+import { arrayMove } from "@dnd-kit/sortable"
 
 function App() {
   const [todos, setTodos] = useState([])
+  const [filter, setFilter] = useState("all")
   const addTodo = (todo) => {
     // setTodos(todo) // all previous todo values would be deleted and only this value would be in array, so we need previous todos
     setTodos((prev) => [{id: Date.now(), ...todo}, ...prev])
@@ -35,6 +38,14 @@ function App() {
     localStorage.setItem("todos", JSON.stringify(todos))
   }, [todos])
 
+  // additional features
+  // filtering todos
+  const filteredTodos = todos.filter((todo) =>{
+    if (filter === "completed") return todo.completed === true;
+    else if (filter === "pending") return todo.completed === false;
+    return true; // return all
+  })
+
   return (
     <TodoProvider value={{todos, addTodo, updateTodo, deleteTodo, toggleComplete}}>
       <div className="bg-[#172842] min-h-screen py-8">
@@ -43,8 +54,35 @@ function App() {
               <div className="mb-4">
                   <TodoForm/> 
               </div>
+              {/* filtering: All | Completed | Pending */}
+              <div className="flex gap-3 mb-4">
+                  <button
+                      onClick={() => setFilter("all")}
+                      className={`px-3 py-1.5 rounded-lg border border-black/10 bg-white/20 text-white 
+                      hover:bg-white/30 duration-150 ${filter === "all" ? "bg-white/40 font-semibold" : ""}`}
+                  >
+                      All
+                  </button>
+
+                  <button
+                      onClick={() => setFilter("completed")}
+                      className={`px-3 py-1.5 rounded-lg border border-black/10 bg-white/20 text-white 
+                      hover:bg-white/30 duration-150 ${filter === "completed" ? "bg-white/40 font-semibold" : ""}`}
+                  >
+                      Completed
+                  </button>
+
+                  <button
+                      onClick={() => setFilter("pending")}
+                      className={`px-3 py-1.5 rounded-lg border border-black/10 bg-white/20 text-white 
+                      hover:bg-white/30 duration-150 ${filter === "pending" ? "bg-white/40 font-semibold" : ""}`}
+                  >
+                      Pending
+                  </button>
+              </div>
+
               <div className="flex flex-wrap gap-y-3">
-                  {todos.map((todo) => (
+                  {filteredTodos.map((todo) => (
                     <div key={todo.id}
                     className='w-full'>
                       <TodoItem todo = {todo} />
