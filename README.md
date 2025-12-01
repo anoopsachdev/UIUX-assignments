@@ -1,67 +1,84 @@
-# UI/UX Assignments
+# 🎨 UI/UX Assignments Repository
 
-## 🌟 Overview
+> **Course:** UI/UX Specialist  
+> **Semester:** 5th Semester, Computer Engineering  
+> **Institution:** Thapar Institute of Engineering and Technology (TIET)
 
-This repository serves as a centralized collection of various assignments, projects, and exercises completed for UI/UX (User Interface and User Experience) coursework or self-study.
+## 📖 Overview
 
-The goal of this collection is to document the design thinking process, showcase the evolution of design skills, and provide a clear record of deliverables for key UI/UX concepts.
+This repository documents the practical assignments and projects completed during my UI/UX Specialist course. It showcases a progression of skills starting from fundamental HTML5 structure and CSS3 styling to responsive design, JavaScript DOM manipulation, and modern frontend development with React.
 
-## 📁 Repository Structure
+The goal of this collection is to demonstrate the application of design thinking, user interface principles, and clean coding practices.
 
-The assignments are organized into separate directories, typically named after the project or the core design task they address.
+## 📂 Assignments Directory
 
-You will typically find the following structure within each assignment folder:
+| Assignment | Project Name | Key Concepts & Tech Stack |
+| :--- | :--- | :--- |
+| **Assignment 1** | **Personal Portfolio** | Semantic HTML, Basic CSS styling, Profile layout. |
+| **Assignment 2** | **Tokyo Travel Agency** | Multi-page website structure, Navigation, CSS layouts, Forms. |
+| **Assignment 3** | **Saturnalia Festival Site** | Event management UI, Tables for scheduling, Nested lists, Gallery grid. |
+| **Assignment 4** | **Saturnalia (Responsive)** | **Responsive Design** (Media Queries), Multimedia integration (Audio/Video), Flexbox & Grid. |
+| **Assignment 5** | **JS Logic & Validation** | JavaScript basics, Form validation, Array manipulation (Map/Filter/Reduce), DOM events. |
+| **Assignment 6** | **Interactive Travel App** | **Dynamic UI**: Price estimator logic, Modal image gallery, DOM manipulation. |
+| **Assignment 7** | **React Todo Manager** | **React + Vite**, Context API, TailwindCSS, LocalStorage, Component-based architecture. |
 
-| Folder/File | Description |
-| :--- | :--- |
-| `[Assignment_Name_1]/` | Directory for a specific project (e.g., "Mobile App Redesign"). |
-| &nbsp;&nbsp;&nbsp; `documentation/` | Contains research findings, user flows, site maps, design briefs, or case studies. |
-| &nbsp;&nbsp;&nbsp; `wireframes/` | Low-fidelity and high-fidelity wireframes (e.g., sketch files, images). |
-| &nbsp;&nbsp;&nbsp; `prototypes/` | Interactive prototypes or links to them (e.g., Figma, Adobe XD links, or HTML files). |
-| &nbsp;&nbsp;&nbsp; `assets/` | Specific images, icons, or design components used in this project. |
-| `[Assignment_Name_2]/` | Directory for another assignment (e.g., "E-commerce Website Audit"). |
-| `style_guide/` | (If present) A folder containing shared design resources, color palettes, typography, and component libraries. |
+---
 
-**Example Folders (Based on Common UI/UX Curriculum):**
-* `User_Research_Analysis`
-* `Information_Architecture_Sitemaps`
-* `High_Fidelity_Prototyping`
-* `Usability_Test_Reports`
-* `Responsive_Web_Design`
+## 🛠️ Project Details
 
-*Note: Please navigate the repository structure to see the exact names and contents of the folders.*
+### 1. Personal Portfolio (Assignment 1)
+A static personal website introducing myself as a Computer Engineering student.
+- **Features:** specific sections for Education, Skills, and Projects.
+- **Tech:** HTML5, CSS3.
 
-## 🛠️ Key Topics Covered
+### 2. Tokyo Travel Agency (Assignment 2 & 6)
+A travel booking website for Tokyo tourism.
+- **Static Version (Assgn 2):** informational pages (Home, Packages, Gallery).
+- **Interactive Version (Assgn 6):** - Dynamic pricing logic based on season and package selection.
+  - Interactive image modal (lightbox) for the gallery.
+  - Form handling.
 
-This repository demonstrates skills across various UI/UX disciplines, including:
+### 3. Saturnalia Festival Website (Assignment 3 & 4)
+A college festival website for "Saturnalia 2025".
+- **Structure:** Event schedules, registration forms, and photo galleries.
+- **Responsive Update (Assgn 4):** Optimized for mobile devices using CSS Media Queries. Includes an embedded event highlight video and audio greetings.
 
-* **User Research:** Conducting interviews, surveys, and competitive analysis.
-* **Information Architecture (IA):** Creating site maps, content hierarchies, and card sorting results.
-* **Interaction Design (IxD):** Developing user flows, journey maps, and wireframes.
-* **Visual Design:** Applying principles of color, typography, and branding.
-* **Prototyping:** Creating both static mockups and interactive prototypes (low- and high-fidelity).
-* **Usability Testing:** Planning test scenarios, conducting sessions, and synthesizing results.
-* **Accessibility (A11y):** Designing with WCAG guidelines in mind.
+### 4. Todo Manager App (Assignment 7)
+A fully functional Task Management application built with a modern stack.
+- **Tech Stack:** React 19, Vite, TailwindCSS.
+- **Features:** - Create, Read, Update, Delete (CRUD) todos.
+  - Filter by status (All, Completed, Pending).
+  - Data persistence using **LocalStorage**.
+  - State management via **Context API**.
+
+---
+
+## 💻 Technologies Used
+
+* **Languages:** HTML5, CSS3, JavaScript (ES6+).
+* **Frameworks/Libraries:** React.js, TailwindCSS.
+* **Tools:** Vite, Git/GitHub, VS Code.
 
 ## 🚀 Getting Started
 
-To explore the assignments in this repository:
+To run the static assignments (1-6):
+1.  Navigate to the specific assignment folder (e.g., `Assignment 6`).
+2.  Open the `index.html` file in any modern web browser.
 
-1.  **Clone the repository:**
+To run the React project (Assignment 7):
+1.  Navigate to the folder:
     ```bash
-    git clone [https://github.com/anoopsachdev/UIUX-assignments.git](https://github.com/anoopsachdev/UIUX-assignments.git)
+    cd assignment7todo
     ```
-2.  Navigate into a specific assignment folder (e.g., `cd UIUX-assignments/[Assignment_Name]`).
-3.  Review the `documentation/` for project context and design decisions.
-4.  Open the files in `prototypes/` or `wireframes/` using the appropriate software (like Figma, Sketch, or a web browser) to view the design deliverables.
+2.  Install dependencies:
+    ```bash
+    npm install
+    ```
+3.  Start the development server:
+    ```bash
+    npm run dev
+    ```
 
-## 🤝 Contribution / Feedback
+## 👤 Author
 
-This repository is primarily for documenting personal assignments. However, if you are a peer, instructor, or recruiter, and you wish to provide feedback on any of the designs, please feel free to:
-
-* Open an Issue in the repository to discuss a specific assignment.
-* Contact the repository owner directly.
-
-## 📄 License
-
-This repository is intended for educational and portfolio purposes. Please see the repository owner's GitHub profile for more information regarding licensing or use of the design work.
+**Anoop Singh** *Computer Engineering Student @ TIET* [LinkedIn](https://www.linkedin.com/in/anoop-sachdev-1b1aa12b5/) | [GitHub](https://github.com/anoopsachdev)
