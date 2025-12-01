@@ -52,3 +52,6 @@ This project demonstrates key React concepts like state management, component co
 ---
 
 ## 📸 Screenshots
+<img width="1440" height="900" alt="Shot 2025-11-30 at 11 47 22 PM" src="https://github.com/user-attachments/assets/9acf4ce9-cb83-4078-b59e-97cd25186327" />
+<img width="1440" height="900" alt="Shot 2025-11-30 at 11 47 12 PM" src="https://github.com/user-attachments/assets/52c4284a-22ef-464d-80f4-a47787fa1970" />
+<img width="1440" height="900" alt="Shot 2025-11-30 at 11 46 58 PM" src="https://github.com/user-attachments/assets/6e199b79-08ef-4830-acd7-6ab3d68180f3" />
