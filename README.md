@@ -2,7 +2,7 @@
 
 > **Course:** UI/UX Specialist  
 > **Semester:** 5th Semester, Computer Engineering  
-> **Institution:** Thapar Institute of Engineering and Technology (TIET), Patiala
+> **Institution:** Thapar Institute of Engineering and Technology (TIET)
 
 ## 📖 Overview
 
