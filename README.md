@@ -6,7 +6,7 @@
 
 ## 📖 Overview
 
-This repository documents the practical assignments and projects completed during my UI/UX Specialist course. It showcases a progression of skills starting from fundamental HTML5 structure and CSS3 styling to responsive design, JavaScript DOM manipulation, and modern frontend development with React.
+This repository documents the practical assignments and projects completed during my UI/UX Specialist course. This course illustrated frontend skills starting from fundamental HTML5 structure and CSS3 styling to responsive design, JavaScript DOM manipulation, and modern frontend development with React.
 
 The goal of this collection is to demonstrate the application of design thinking, user interface principles, and clean coding practices.
 
@@ -27,7 +27,7 @@ The goal of this collection is to demonstrate the application of design thinking
 ## 🛠️ Project Details
 
 ### 1. Personal Portfolio (Assignment 1)
-A static personal website introducing myself as a Computer Engineering student.
+A static personal portfolio website.
 - **Features:** specific sections for Education, Skills, and Projects.
 - **Tech:** HTML5, CSS3.
 
@@ -81,4 +81,4 @@ To run the React project (Assignment 7):
 
 ## 👤 Author
 
-**Anoop Singh** *Computer Engineering Student @ TIET* [LinkedIn](https://www.linkedin.com/in/anoop-sachdev-1b1aa12b5/) | [GitHub](https://github.com/anoopsachdev)
+**Anoop Sachdev** *Computer Engineering Student @ TIET* [Leetcode](https://leetcode.com/u/anoop_sachdev/) | [GitHub](https://github.com/anoopsachdev)
