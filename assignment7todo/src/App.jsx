@@ -2,8 +2,6 @@ import { useEffect, useState } from 'react'
 import {TodoProvider} from "./contexts"
 import TodoForm from './components/TodoForm'
 import TodoItem from './components/TodoItem'
-import { DndContext, closestCenter } from "@dnd-kit/core"
-import { arrayMove } from "@dnd-kit/sortable"
 
 function App() {
   const [todos, setTodos] = useState([])
