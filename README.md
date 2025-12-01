@@ -8,7 +8,7 @@
 
 This repository documents the practical assignments and projects completed during my UI/UX Specialist course. This course illustrated frontend skills starting from fundamental HTML5 structure and CSS3 styling to responsive design, JavaScript DOM manipulation, and modern frontend development with React.
 
-The assignments featured in this repository serve as practical exercises to reinforce foundational UI/UX concepts and strengthen design competencies.
+The assignments featured in this repository serve as exercises to reinforce foundational UI/UX concepts and strengthen design competencies.
 
 ## 📂 Assignments Directory
 
